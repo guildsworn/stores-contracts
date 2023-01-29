@@ -32,11 +32,11 @@ cp contracts/[Contract name] contracts/interfaces/
 1. Create `.env` file in root folder or copy and check `.env.example`
 
 Available extra env variables:
-`STABLE_TOKEN_ADDRESS` for general, or use `STABLE_TOKEN_ADDRESS_[ChainId]` for network specific settings
-`ELDFALL_TOKEN_ADDRESS` for general, or use `ELDFALL_TOKEN_ADDRESS_[ChainId]` for network specific settings
-`CHARACTER_NFT_ADDRESS` for general, or use `CHARACTER_NFT_ADDRESS_[ChainId]` for network specific settings
-`PRICE_RESOLVER_ORACLE_ADDRESS` for general, or use `PRICE_RESOLVER_ORACLE_ADDRESS_[ChainId]` for network specific settings
-`CHARACTER_STORE_ADDRESS` for general, or use `CHARACTER_STORE_ADDRESS_[ChainId]` for network specific settings
+- `STABLE_TOKEN_ADDRESS` for general, or use `STABLE_TOKEN_ADDRESS_[ChainId]` for network specific settings
+- `ELDFALL_TOKEN_ADDRESS` for general, or use `ELDFALL_TOKEN_ADDRESS_[ChainId]` for network specific settings
+- `CHARACTER_NFT_ADDRESS` for general, or use `CHARACTER_NFT_ADDRESS_[ChainId]` for network specific settings
+- `PRICE_RESOLVER_ORACLE_ADDRESS` for general, or use `PRICE_RESOLVER_ORACLE_ADDRESS_[ChainId]` for network specific settings
+- `CHARACTER_STORE_ADDRESS` for general, or use `CHARACTER_STORE_ADDRESS_[ChainId]` for network specific settings
 
 
 ### [Deploy parameters](https://github.com/wighawag/hardhat-deploy#1-hardhat-deploy)
