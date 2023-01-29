@@ -1,0 +1,22 @@
+{
+    "eslint.packageManager":"yarn",
+    "eslint.run": "onSave",    
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true,
+        "source.organizeImports": true
+    },
+    "editor.quickSuggestions": {
+        "comments": "on",
+        "strings": "on",
+        "other": "on"
+    },
+    "editor.acceptSuggestionOnEnter": "on",
+    "editor.quickSuggestionsDelay": 10,
+    "editor.wordBasedSuggestions": true,
+    "[solidity]": {
+        "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
+    },
+
+}

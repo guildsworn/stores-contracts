@@ -1,0 +1,35 @@
+# Coverage directory used by tools like istanbul
+coverage
+coverage.json
+coverageEnv
+
+# Dependency directory
+node_modules
+
+# Debug log from npm
+npm-debug.log
+yarn-error.log
+
+# local env variables
+.env
+.npmrc
+
+# macOS
+.DS_Store
+
+# only used to package @openzeppelin/contracts
+contracts/build/
+contracts/deployments/
+contracts/README.md
+contracts/*.log
+
+# temporary artifact from solidity-coverage
+allFiredEvents
+.coverage_artifacts
+.coverage_cache
+.coverage_contracts
+
+# Hardhat
+/cache
+/artifacts
+
