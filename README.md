@@ -58,5 +58,5 @@ npx hardhat deploy --write true --network oasis_sapphire_mainnet
 
 # Publish the NPM package
 ```shell
-yarn publish --access public
+yarn publish
 ```

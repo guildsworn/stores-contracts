@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -375,10 +375,10 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable {
 			stableToEldPrice;
 		tokenAmount = tokenAmount / oneToken;
 
-		console.log("Character price: %s STABLE", currentCharacter.price);
-		console.log("1 STABLE = %s ELD", stableToEldPrice);
-		console.log("ELD kickback: %s", _eldKickback);
-		console.log("Result of kickback: %s ELD", tokenAmount);
+		// console.log("Character price: %s STABLE", currentCharacter.price);
+		// console.log("1 Ether STABLE = %s ELD", stableToEldPrice);
+		// console.log("ELD kickback: %s", _eldKickback);
+		// console.log("Result of kickback: %s ELD", tokenAmount);
 
 		if (tokenAmount > 0) {
 			_eldInstance.safeMint(_msgSender(), tokenAmount);

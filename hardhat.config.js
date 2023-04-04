@@ -73,6 +73,7 @@ module.exports = {
         accounts: ACCOUNTS,
         live: false,
         saveDeployments: true,
+        blockConfirmations: 2,
         tags: ["test", "oasis", "testnet"]
       },
       oasis_sapphire_mainnet: {
@@ -81,6 +82,7 @@ module.exports = {
         accounts: ACCOUNTS,
         live: true,
         saveDeployments: true,
+        blockConfirmations: 2,
         tags: ["live", "oasis", "mainnet", "production"]
       },
   },

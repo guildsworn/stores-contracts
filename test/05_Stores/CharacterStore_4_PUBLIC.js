@@ -54,12 +54,12 @@ describe("CharacterStore_4_PUBLIC", function () {
         EldTokenInstance = await EldtokenFactory.deploy();
         await EldTokenInstance.deployed();
 
-        Uniswapv2PairFactory = await ethers.getContractFactory("UniswapV2PairMockContract");
-        UniswapV2PairInstance = await Uniswapv2PairFactory.deploy();
-        await UniswapV2PairInstance.deployed();
-        await UniswapV2PairInstance.init(EldTokenInstance.address, TokenInstance.address, utils.parseEther("10000"), utils.parseEther("1000"));
+        // Uniswapv2PairFactory = await ethers.getContractFactory("UniswapV2PairMockContract");
+        // UniswapV2PairInstance = await Uniswapv2PairFactory.deploy();
+        // await UniswapV2PairInstance.deployed();
+        // await UniswapV2PairInstance.init(EldTokenInstance.address, TokenInstance.address, utils.parseEther("10000"), utils.parseEther("1000"));
 
-        const PriceResolverFactory = await ethers.getContractFactory("PriceResolverUniV2Contract");
+        const PriceResolverFactory = await ethers.getContractFactory("PriceResolverOracleContract");
         PriceResolverInstance = await PriceResolverFactory.deploy();
         await PriceResolverInstance.deployed();
         // --------------------------
@@ -72,8 +72,9 @@ describe("CharacterStore_4_PUBLIC", function () {
             defaultAdmin.address,
             moderator.address,
             EldTokenInstance.address,
-            UniswapV2PairInstance.address
+            TokenInstance.address
         );
+        await PriceResolverInstance.connect(moderator).setPrice(utils.parseEther("1"), utils.parseEther("10"));
 
         await StoreInstance.init(
             defaultAdmin.address,
