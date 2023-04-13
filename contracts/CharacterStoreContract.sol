@@ -319,7 +319,7 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable, ICh
 
 	function getCharacter(bytes32 characterHash_) public view returns (CharacterDataResult memory) {
 		CharacterData memory characterData = _characterDataMap[characterHash_];
-		require(characterData.avaliable, "Character class does not exist!");
+		require(characterData.avaliable, "Character does not exist!");
 
 		return CharacterDataResult({
 			name: characterData.name,
