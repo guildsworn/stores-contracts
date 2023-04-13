@@ -278,13 +278,13 @@ describe("CharacterStore_3_MODERATOR", function () {
         expect(characterData.active).to.be.false;
     });
 
-    it("removeCharacter - Character does not exist!", async function () {
-        await expect(StoreInstance.connect(moderator).removeCharacter(character1Hash)).to.be.revertedWith('Character does not exist!');
+    it("removeCharacter - Character class does not exist!", async function () {
+        await expect(StoreInstance.connect(moderator).removeCharacter(character1Hash)).to.be.revertedWith('Character class does not exist!');
     });
     it("removeCharacter remove last - Sucess", async function () {
         await StoreInstance.connect(moderator).addCharacter(character1Name, character1Hash, character1Price, character1Active);
         await StoreInstance.connect(moderator).removeCharacter(character1Hash);
-        await expect(StoreInstance.getCharacter(character1Hash)).to.be.revertedWith('Character does not exist!');
+        await expect(StoreInstance.getCharacter(character1Hash)).to.be.revertedWith('Character class does not exist!');
     });
     it("removeCharacter remove first - Sucess", async function () {
         await StoreInstance.connect(moderator).addCharacter(character1Name, character1Hash, character1Price, character1Active);

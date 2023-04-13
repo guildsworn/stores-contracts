@@ -58,7 +58,7 @@ module.exports = {
       hardhat: {
           chainId: 31337,
           live: false,
-          saveDeployments: true,
+          saveDeployments: false,
           tags: ["test", "local"]
       },
       localhost: {

@@ -31,9 +31,10 @@ module.exports = async ({ getNamedAccounts, deployments, network, guildsworn }) 
         let character1Hash = utils.hashMessage(character1Name);
         let character1Price = utils.parseEther("50");
         let character1Active = true;
-        let character1Data = await storeDeployerInstance.getCharacter(character1Hash);
-        if (utils.stripZeros(character1Data.characterHash).length == 0)
-        {
+        try {
+            await storeDeployerInstance.getCharacter(character1Hash);
+            log(`Character ${character1Name} already created.`);
+        } catch (error) {   
             let transactionResponse = await storeModeratorWriteInstance.addCharacter(character1Name, character1Hash, character1Price, character1Active);
             await transactionResponse.wait(confirmations);
             log(`Character ${character1Name} created`);
@@ -43,9 +44,10 @@ module.exports = async ({ getNamedAccounts, deployments, network, guildsworn }) 
         let character2Hash = utils.hashMessage(character2Name);
         let character2Price = utils.parseEther("50");
         let character2Active = true;
-        let character2Data = await storeDeployerInstance.getCharacter(character2Hash);
-        if (utils.stripZeros(character2Data.characterHash).length == 0)
-        {
+        try {
+            await storeDeployerInstance.getCharacter(character2Hash);
+            log(`Character ${character2Name} already created.`);
+        } catch (error) {
             transactionResponse = await storeModeratorWriteInstance.addCharacter(character2Name, character2Hash, character2Price, character2Active);
             await transactionResponse.wait(confirmations);        
             log(`Character ${character2Name} created`);
@@ -55,8 +57,12 @@ module.exports = async ({ getNamedAccounts, deployments, network, guildsworn }) 
         let character3Hash = utils.hashMessage(character3Name);
         let character3Price = utils.parseEther("50");
         let character3Active = true;
-        let character3Data = await storeDeployerInstance.getCharacter(character3Hash);
-        if (utils.stripZeros(character3Data.characterHash).length == 0)
+        try
+        {
+            await storeDeployerInstance.getCharacter(character3Hash);
+            log(`Character ${character3Name} already created.`);
+        }
+        catch (error)
         {
             transactionResponse = await storeModeratorWriteInstance.addCharacter(character3Name, character3Hash, character3Price, character3Active);
             await transactionResponse.wait(confirmations);
@@ -67,32 +73,44 @@ module.exports = async ({ getNamedAccounts, deployments, network, guildsworn }) 
         let character4Hash = utils.hashMessage(character4Name);
         let character4Price = utils.parseEther("50");
         let character4Active = true;
-        let character4Data = await storeDeployerInstance.getCharacter(character4Hash);
-        if (utils.stripZeros(character4Data.characterHash).length == 0)
+        try
+        {
+            await storeDeployerInstance.getCharacter(character4Hash);
+            log(`Character ${character4Name} already created.`);
+        }
+        catch (error)
         {
             transactionResponse = await storeModeratorWriteInstance.addCharacter(character4Name, character4Hash, character4Price, character4Active);
             await transactionResponse.wait(confirmations);
             log(`Character ${character4Name} created`);
-        }
+        }        
 
         let character5Name = "Taskmage Explorer";
         let character5Hash = utils.hashMessage(character5Name);
         let character5Price = utils.parseEther("50");
         let character5Active = true;
-        let character5Data = await storeDeployerInstance.getCharacter(character5Hash);
-        if (utils.stripZeros(character5Data.characterHash).length == 0)
+        try
+        {
+            await storeDeployerInstance.getCharacter(character5Hash);
+            log(`Character ${character5Name} already created.`);
+        }
+        catch (error)
         {
             transactionResponse = await storeModeratorWriteInstance.addCharacter(character5Name, character5Hash, character5Price, character5Active);
             await transactionResponse.wait(confirmations);
             log(`Character ${character5Name} created`);
-        }
+        }        
 
         let character6Name = "Amazon Gladiatrix";
         let character6Hash = utils.hashMessage(character6Name);
         let character6Price = utils.parseEther("50");
         let character6Active = true;
-        let character6Data = await storeDeployerInstance.getCharacter(character6Hash);
-        if (utils.stripZeros(character6Data.characterHash).length == 0)
+        try
+        {
+            await storeDeployerInstance.getCharacter(character6Hash);
+            log(`Character ${character6Name} already created.`);
+        }
+        catch (error)
         {
             transactionResponse = await storeModeratorWriteInstance.addCharacter(character6Name, character6Hash, character6Price, character6Active);
             await transactionResponse.wait(confirmations);
