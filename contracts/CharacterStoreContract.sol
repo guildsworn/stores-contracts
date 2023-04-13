@@ -5,29 +5,13 @@ pragma solidity >=0.8.0 <0.9.0;
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./interfaces/ICharacterStoreContract.sol";
 
 import "@guildsworn/token-contracts/contracts/interfaces/ICharacterNftContract.sol";
 import "@guildsworn/token-contracts/contracts/interfaces/IEldfallTokenContract.sol";
 import "@guildsworn/priceresolver-contracts/contracts/interfaces/IPriceResolverContract.sol";
 
-struct CharacterData {
-	string name;
-	uint storeId;
-	bytes32 characterHash;
-	uint256 price;
-	bool active;
-	bool avaliable;
-}
-
-enum CharacterParams {
-	CHAR_NAME,
-	CHAR_STOREID,
-	CHAR_HASH,
-	CHAR_PRICE,
-	CHAR_ACTIVE
-}
-
-contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable {
+contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable, ICharacterStoreContract{
 	using SafeERC20 for IERC20;
 	using SafeERC20 for IEldfallTokenContract;
 
@@ -83,11 +67,7 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable {
 		_revokeRole(DEFAULT_ADMIN_ROLE, _msgSender());
 	}
 
-	function salvageTokensFromContract(
-		address tokenAddress_,
-		address to_,
-		uint amount_
-	) public onlyRole(DEFAULT_ADMIN_ROLE) {
+	function salvageTokensFromContract(address tokenAddress_, address to_, uint amount_) public onlyRole(DEFAULT_ADMIN_ROLE) {
 		bytes memory callPayload = abi.encodePacked(
 			bytes4(keccak256(bytes("transfer(address,uint256)"))),
 			abi.encode(to_, amount_)
@@ -105,69 +85,44 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable {
 	// **************************************************
 	// ***************** MODERATOR REGION ***************
 	// **************************************************
-	function setVaultAddress(
-		address vaultAddress_
-	) public onlyRole(MODERATOR_ROLE) {
+	function setVaultAddress(address vaultAddress_) public onlyRole(MODERATOR_ROLE) {
 		require(_vaultAddress != vaultAddress_, "Value is already set!");
 		emit VaultAddressChanged(_vaultAddress, vaultAddress_);
 		_vaultAddress = vaultAddress_;
 	}
 
-	function setPriceResolverInstance(
-		address priceResolverAddress_
-	) public onlyRole(MODERATOR_ROLE) {
-		require(
-			address(_priceResolverInstance) != priceResolverAddress_,
-			"Value is already set!"
-		);
-		emit PriceResolverInstanceChanged(
-			address(_priceResolverInstance),
-			priceResolverAddress_
-		);
-		_priceResolverInstance = IPriceResolverContract(
-			priceResolverAddress_
-		);
+	function setPriceResolverInstance(address priceResolverAddress_) public onlyRole(MODERATOR_ROLE) {
+		require(address(_priceResolverInstance) != priceResolverAddress_, "Value is already set!");
+		emit PriceResolverInstanceChanged(address(_priceResolverInstance), priceResolverAddress_);
+		_priceResolverInstance = IPriceResolverContract(priceResolverAddress_);
 	}
 
-	function setEldInstance(
-		address eldAddress_
-	) public onlyRole(MODERATOR_ROLE) {
+	function setEldInstance(address eldAddress_) public onlyRole(MODERATOR_ROLE) {
 		require(address(_eldInstance) != eldAddress_, "Value is already set!");
 		emit EldInstanceChanged(address(_eldInstance), eldAddress_);
 		_eldInstance = IEldfallTokenContract(eldAddress_);
 	}
 
-	function setNftInstance(
-		address nftAddress_
-	) public onlyRole(MODERATOR_ROLE) {
+	function setNftInstance(address nftAddress_) public onlyRole(MODERATOR_ROLE) {
 		require(address(_nftInstance) != nftAddress_, "Value is already set!");
 		emit NftInstanceChanged(address(_nftInstance), nftAddress_);
 		_nftInstance = ICharacterNftContract(nftAddress_);
 	}
 
-	function setStableInstance(
-		address stableAddress_
-	) public onlyRole(MODERATOR_ROLE) {
-		require(
-			address(_stableInstance) != stableAddress_,
-			"Value is already set!"
-		);
+	function setStableInstance(address stableAddress_) public onlyRole(MODERATOR_ROLE) {
+		require(address(_stableInstance) != stableAddress_, "Value is already set!");
 		emit StableInstanceChanged(address(_stableInstance), stableAddress_);
 		_stableInstance = IERC20(stableAddress_);
 	}
 
-	function setEldDiscount(
-		uint8 eldDiscount_
-	) public onlyRole(MODERATOR_ROLE) {
+	function setEldDiscount(uint8 eldDiscount_) public onlyRole(MODERATOR_ROLE) {
 		require(_eldDiscount != eldDiscount_, "Value is already set!");
 		require(eldDiscount_ < 100, "Value must be lower than 100!");
 		emit EldDiscountChanged(_eldDiscount, eldDiscount_);
 		_eldDiscount = eldDiscount_;
 	}
 
-	function setEldKickback(
-		uint8 eldKickback_
-	) public onlyRole(MODERATOR_ROLE) {
+	function setEldKickback(uint8 eldKickback_) public onlyRole(MODERATOR_ROLE) {
 		require(_eldKickback != eldKickback_, "Value is already set!");
 		require(eldKickback_ < 100, "Value must be lower than 100!");
 		emit EldKickbackChanged(_eldKickback, eldKickback_);
@@ -183,16 +138,8 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable {
 		_storeActive = active_;
 	}
 
-	function addCharacter(
-		string memory name_,
-		bytes32 characterHash_,
-		uint256 price_,
-		bool active_
-	) public onlyRole(MODERATOR_ROLE) {
-		require(
-			!_characterDataMap[characterHash_].avaliable,
-			"Character is already avaliable!"
-		);
+	function addCharacter(string memory name_, bytes32 characterHash_, uint256 price_, bool active_) public onlyRole(MODERATOR_ROLE) {
+		require(!_characterDataMap[characterHash_].avaliable, "Character is already avaliable!");
 		_characterDataMap[characterHash_] = CharacterData(
 			name_,
 			_avaliableCharacters.length,
@@ -205,121 +152,57 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable {
 		emit CharacterAdded(characterHash_);
 	}
 
-	function editCharacter(
-		bytes32 characterHash_,
-		uint8 paramId_,
-		bytes memory paramData_
-	) public onlyRole(MODERATOR_ROLE) {
-		require(
-			_characterDataMap[characterHash_].avaliable,
-			"Character does not exist!"
-		);
+	function editCharacter(bytes32 characterHash_, uint8 paramId_, bytes memory paramData_) public onlyRole(MODERATOR_ROLE) {
+		require(_characterDataMap[characterHash_].avaliable, "Character does not exist!");
 
 		if (paramId_ == uint256(CharacterParams.CHAR_NAME)) {
 			string memory nameNewValue = abi.decode(paramData_, (string));
-			bytes memory nameOldValue = abi.encode(
-				_characterDataMap[characterHash_].name
-			);
-			require(
-				keccak256(nameOldValue) != keccak256(paramData_),
-				"Param is already set!"
-			);
-			emit CharacterDataUpdated(
-				characterHash_,
-				paramId_,
-				nameOldValue,
-				paramData_
-			);
+			bytes memory nameOldValue = abi.encode(_characterDataMap[characterHash_].name);
+			require(keccak256(nameOldValue) != keccak256(paramData_), "Param is already set!");
+			emit CharacterDataUpdated(characterHash_, paramId_, nameOldValue, paramData_);
 			_characterDataMap[characterHash_].name = nameNewValue;
 		} else if (paramId_ == uint256(CharacterParams.CHAR_STOREID)) {
 			uint256 storeIdNewValue = abi.decode(paramData_, (uint256));
 			uint256 storeIdOldValue = _characterDataMap[characterHash_].storeId;
-			require(
-				storeIdNewValue < _avaliableCharacters.length,
-				"New id is out of range!"
-			);
-			require(
-				storeIdNewValue != storeIdOldValue,
-				"Param is already set!"
-			);
+			require(storeIdNewValue < _avaliableCharacters.length, "New id is out of range!");
+			require(storeIdNewValue != storeIdOldValue, "Param is already set!");
 			bytes32 firstChar = _avaliableCharacters[storeIdNewValue];
 			bytes32 secondChar = _avaliableCharacters[storeIdOldValue];
 
-			emit CharacterDataUpdated(
-				firstChar,
-				paramId_,
-				abi.encode(storeIdOldValue),
-				paramData_
-			);
-			emit CharacterDataUpdated(
-				secondChar,
-				paramId_,
-				paramData_,
-				abi.encode(storeIdOldValue)
-			);
+			emit CharacterDataUpdated(firstChar, paramId_, abi.encode(storeIdOldValue), paramData_);
+			emit CharacterDataUpdated(secondChar, paramId_, paramData_, abi.encode(storeIdOldValue));
+
 			_avaliableCharacters[storeIdOldValue] = firstChar;
 			_avaliableCharacters[storeIdNewValue] = secondChar;
 			_characterDataMap[firstChar].storeId = storeIdOldValue;
 			_characterDataMap[secondChar].storeId = storeIdNewValue;
 		} else if (paramId_ == uint256(CharacterParams.CHAR_HASH)) {
 			bytes32 charHashNewValue = abi.decode(paramData_, (bytes32));
-			require(
-				!_characterDataMap[charHashNewValue].avaliable,
-				"Character is already avaliable!"
-			);
-			emit CharacterDataUpdated(
-				characterHash_,
-				paramId_,
-				abi.encode(characterHash_),
-				paramData_
-			);
-			_avaliableCharacters[
-				_characterDataMap[characterHash_].storeId
-			] = charHashNewValue;
-			_characterDataMap[charHashNewValue] = _characterDataMap[
-				characterHash_
-			];
-			_characterDataMap[charHashNewValue]
-				.characterHash = charHashNewValue;
+			require(!_characterDataMap[charHashNewValue].avaliable, "Character is already avaliable!");
+			emit CharacterDataUpdated(characterHash_, paramId_, abi.encode(characterHash_), paramData_);
+
+			_avaliableCharacters[_characterDataMap[characterHash_].storeId] = charHashNewValue;
+			_characterDataMap[charHashNewValue] = _characterDataMap[characterHash_];
+			_characterDataMap[charHashNewValue].characterHash = charHashNewValue;
 			delete _characterDataMap[characterHash_];
 		} else if (paramId_ == uint256(CharacterParams.CHAR_PRICE)) {
 			uint256 priceNewValue = abi.decode(paramData_, (uint256));
-			require(
-				priceNewValue != _characterDataMap[characterHash_].price,
-				"Param is already set!"
-			);
-			emit CharacterDataUpdated(
-				characterHash_,
-				paramId_,
-				paramData_,
-				abi.encode(_characterDataMap[characterHash_].price)
-			);
+			require(priceNewValue != _characterDataMap[characterHash_].price, "Param is already set!");
+
+			emit CharacterDataUpdated(characterHash_, paramId_, paramData_, abi.encode(_characterDataMap[characterHash_].price));
 			_characterDataMap[characterHash_].price = priceNewValue;
 		} else if (paramId_ == uint256(CharacterParams.CHAR_ACTIVE)) {
 			bool activeNewValue = abi.decode(paramData_, (bool));
-			require(
-				_characterDataMap[characterHash_].active != activeNewValue,
-				"Param is already set!"
-			);
-			emit CharacterDataUpdated(
-				characterHash_,
-				paramId_,
-				paramData_,
-				abi.encode(_characterDataMap[characterHash_].active)
-			);
+			require(_characterDataMap[characterHash_].active != activeNewValue, "Param is already set!");
+			emit CharacterDataUpdated(characterHash_, paramId_, paramData_, abi.encode(_characterDataMap[characterHash_].active));
 			_characterDataMap[characterHash_].active = activeNewValue;
 		} else {
 			revert("Param does not exist");
 		}
 	}
 
-	function removeCharacter(
-		bytes32 characterHash_
-	) public onlyRole(MODERATOR_ROLE) {
-		require(
-			_characterDataMap[characterHash_].avaliable,
-			"Character does not exist!"
-		);
+	function removeCharacter(bytes32 characterHash_) public onlyRole(MODERATOR_ROLE) {
+		require(_characterDataMap[characterHash_].avaliable, "Character does not exist!");
 		uint lastId = _avaliableCharacters.length - 1;
 		if (_characterDataMap[characterHash_].storeId != lastId) {
 			bytes32 lastCharacterHash = _avaliableCharacters[lastId];
@@ -346,9 +229,7 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable {
 	// **************************************************
 	function buyWithStable(bytes32 characterHash_) public nonReentrant {
 		require(_storeActive, "Store is closed!");
-		CharacterData memory currentCharacter = _characterDataMap[
-			characterHash_
-		];
+		CharacterData memory currentCharacter = _characterDataMap[characterHash_];
 		require(currentCharacter.avaliable, "Character does not exist!");
 		require(currentCharacter.active, "Character is not active!");
 
@@ -362,17 +243,11 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable {
 
 		_nftInstance.safeMint(_msgSender(), characterHash_);
 
-		emit CharacterBought(
-			characterHash_,
-			_msgSender(),
-			address(_stableInstance),
-			currentCharacter.price
-		);
+		emit CharacterBought(characterHash_, _msgSender(), address(_stableInstance), currentCharacter.price);
 
 		uint256 oneToken = 1 * 10 ** _priceResolverInstance.getStableDecimals();
 		uint256 stableToEldPrice = _priceResolverInstance.getStablePrice();
-		uint256 tokenAmount = ((uint256(_eldKickback) * currentCharacter.price) / 100) *
-			stableToEldPrice;
+		uint256 tokenAmount = ((uint256(_eldKickback) * currentCharacter.price) / 100) * stableToEldPrice;
 		tokenAmount = tokenAmount / oneToken;
 
 		// console.log("Character price: %s STABLE", currentCharacter.price);
@@ -387,29 +262,17 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable {
 
 	function buyWithEld(bytes32 characterHash_) public nonReentrant {
 		require(_storeActive, "Store is closed!");
-		CharacterData memory currentCharacter = _characterDataMap[
-			characterHash_
-		];
+		CharacterData memory currentCharacter = _characterDataMap[characterHash_];
 		require(currentCharacter.avaliable, "Character does not exist!");
 		require(currentCharacter.active, "Character is not active!");
 
 		uint eldldToStablePrice = _priceResolverInstance.getStablePrice();
-		uint priceInEld = (((100 - _eldDiscount) * currentCharacter.price) /
-			100) * eldldToStablePrice;
+		uint priceInEld = (((100 - _eldDiscount) * currentCharacter.price) / 100) * eldldToStablePrice;
 		//_eldInstance.safeTransferFrom(_msgSender(), _vaultAddress, priceInEld);
-		SafeERC20.safeTransferFrom(
-			IERC20(address(_eldInstance)),
-			_msgSender(),
-			_vaultAddress,
-			priceInEld
-		);
+		SafeERC20.safeTransferFrom(IERC20(address(_eldInstance)), _msgSender(), _vaultAddress, priceInEld);
 		_nftInstance.safeMint(_msgSender(), characterHash_);
-		emit CharacterBought(
-			characterHash_,
-			_msgSender(),
-			address(_eldInstance),
-			priceInEld
-		);
+		
+		emit CharacterBought(characterHash_, _msgSender(), address(_eldInstance), priceInEld);
 
 		uint tokenAmount = ((_eldKickback * priceInEld) / 100);
 		_eldInstance.safeMint(_msgSender(), tokenAmount);
@@ -450,33 +313,73 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable {
 		return _storeActive;
 	}
 
-	function getCharacter(
-		bytes32 characterHash_
-	) public view returns (CharacterData memory) {
-		return _characterDataMap[characterHash_];
-	}
-
 	function getAvaliableCharacters() public view returns (bytes32[] memory) {
 		return _avaliableCharacters;
 	}
 
-	function getAvaliableCharactersData()
-		public
-		view
-		returns (CharacterData[] memory)
-	{
-		CharacterData[] memory answer = new CharacterData[](
-			_avaliableCharacters.length
-		);
-		for (uint i = 0; i < _avaliableCharacters.length; i++) {
-			answer[i] = _characterDataMap[_avaliableCharacters[i]];
-		}
-		return answer;
+	function getCharacter(bytes32 characterHash_) public view returns (CharacterDataResult memory) {
+		CharacterData memory characterData = _characterDataMap[characterHash_];
+		if (!characterData.avaliable)
+			revert("Character does not exist!");
+
+		return CharacterDataResult({
+			name: characterData.name,
+			storeId: characterData.storeId,
+			characterHash: characterHash_,
+			price: characterData.price,
+			active: characterData.active
+		});
+	}
+
+	function getCharacters(uint256 page_, uint256 pageSize_, bool activeOnly_) public view returns (CharacterDataResult[] memory) {
+		uint256 start = (page_-1) * pageSize_;
+		uint256 length = _avaliableCharacters.length;
+		if (start >= length) {
+            return new CharacterDataResult[](0);
+        }
+
+		uint256 resultIndex = 0;
+        CharacterDataResult[] memory characterDataResultArray = new CharacterDataResult[](pageSize_);
+        for (uint256 i = start; i < length; i++) {
+			bool added = false;
+            if (activeOnly_) {
+                if (_characterDataMap[_avaliableCharacters[i]].active) {
+                    characterDataResultArray[resultIndex] = getCharacter(_avaliableCharacters[i]);
+					added = true;
+                }
+            } else {
+                characterDataResultArray[resultIndex] = getCharacter(_avaliableCharacters[i]);
+				added = true;
+            }
+            
+            if (resultIndex + 1 == pageSize_) {
+                break;
+            }
+
+			if (added)
+            	resultIndex++;
+        }
+        // Check page size
+        if (resultIndex + 1 < pageSize_) {
+            // Resize array
+            CharacterDataResult[] memory characterDataResultArray2 = new CharacterDataResult[](resultIndex);
+            for (uint256 i = 0; i < resultIndex; i++) {
+                characterDataResultArray2[i] = characterDataResultArray[i];
+            }
+            return characterDataResultArray2;
+        }
+        else {
+            return characterDataResultArray;
+        }
 	}
 
 	function isInitialised() public view returns (bool) {
 		return _initialised;
 	}
+
+	function supportsInterface(bytes4 interfaceId_) public view override(AccessControlEnumerable) returns (bool) {
+        return interfaceId_ == type(ICharacterStoreContract).interfaceId || super.supportsInterface(interfaceId_);
+    }
 
 	// **************************************************
 	// ****************** EVENTS REGION *****************

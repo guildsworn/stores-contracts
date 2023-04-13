@@ -178,7 +178,6 @@ describe("CharacterStore_3_MODERATOR", function () {
         expect(characterData.characterHash).to.equal(character1Hash);
         expect(characterData.price.eq(character1Price)).to.be.true;
         expect(characterData.active).to.equal(character1Active);
-        expect(characterData.avaliable).to.be.true;
     });
 
     it("editCharacter - Fail if not called from moderator", async function () {
@@ -200,7 +199,6 @@ describe("CharacterStore_3_MODERATOR", function () {
         expect(characterData.characterHash).to.equal(character1Hash);
         expect(characterData.price.eq(character1Price)).to.be.true;
         expect(characterData.active).to.equal(character1Active);
-        expect(characterData.avaliable).to.be.true;
     });
 
     it("editCharacter Character StoreId - Fail if same value", async function () {
@@ -227,7 +225,6 @@ describe("CharacterStore_3_MODERATOR", function () {
         expect(characterData.characterHash).to.equal(character1Hash);
         expect(characterData.price.eq(character1Price)).to.be.true;
         expect(characterData.active).to.equal(character1Active);
-        expect(characterData.avaliable).to.be.true;
     });
 
     it("editCharacter Character Hash - Character is already avaliable!", async function () {
@@ -247,7 +244,6 @@ describe("CharacterStore_3_MODERATOR", function () {
         expect(characterData.characterHash).to.equal(character2Hash);
         expect(characterData.price.eq(character1Price)).to.be.true;
         expect(characterData.active).to.equal(character1Active);
-        expect(characterData.avaliable).to.be.true;
     });
 
     it("editCharacter Character Price - Param is already set!", async function () {
@@ -264,7 +260,6 @@ describe("CharacterStore_3_MODERATOR", function () {
         expect(characterData.characterHash).to.equal(character1Hash);
         expect(characterData.price.eq(character2Price)).to.be.true;
         expect(characterData.active).to.equal(character1Active);
-        expect(characterData.avaliable).to.be.true;
     });
 
     it("editCharacter Character Active - Param is already set!", async function () {
@@ -281,7 +276,6 @@ describe("CharacterStore_3_MODERATOR", function () {
         expect(characterData.characterHash).to.equal(character1Hash);
         expect(characterData.price.eq(character1Price)).to.be.true;
         expect(characterData.active).to.be.false;
-        expect(characterData.avaliable).to.be.true;
     });
 
     it("removeCharacter - Character does not exist!", async function () {
@@ -290,29 +284,41 @@ describe("CharacterStore_3_MODERATOR", function () {
     it("removeCharacter remove last - Sucess", async function () {
         await StoreInstance.connect(moderator).addCharacter(character1Name, character1Hash, character1Price, character1Active);
         await StoreInstance.connect(moderator).removeCharacter(character1Hash);
-        let characterData = await StoreInstance.getCharacter(character1Hash);
-        expect(characterData.name).to.be.empty;
-        expect(characterData.characterHash).to.equal(ethers.constants.Zero);
-        expect(characterData.price.eq(0)).to.be.true;
-        expect(characterData.active).to.be.false;
-        expect(characterData.avaliable).to.be.false
+        await expect(StoreInstance.getCharacter(character1Hash)).to.be.revertedWith('Character does not exist!');
     });
     it("removeCharacter remove first - Sucess", async function () {
         await StoreInstance.connect(moderator).addCharacter(character1Name, character1Hash, character1Price, character1Active);
         await StoreInstance.connect(moderator).addCharacter(character2Name, character2Hash, character2Price, !character2Active);
         await StoreInstance.connect(moderator).removeCharacter(character1Hash);
-        let characterData = await StoreInstance.getCharacter(character1Hash);
-        expect(characterData.name).to.be.empty;
-        expect(characterData.characterHash).to.equal(ethers.constants.Zero);
-        expect(characterData.price.eq(0)).to.be.true;
-        expect(characterData.active).to.be.false;
-        expect(characterData.avaliable).to.be.false
+        await expect(StoreInstance.getCharacter(character1Hash)).to.be.revertedWith('Character does not exist!');
+        // let characterData = await StoreInstance.getCharacter(character1Hash);
+        // expect(characterData.name).to.be.empty;
+        // expect(characterData.characterHash).to.equal(ethers.constants.Zero);
+        // expect(characterData.price.eq(0)).to.be.true;
+        // expect(characterData.active).to.be.false;
+
         characterData = await StoreInstance.getCharacter(character2Hash);
         expect(characterData.name).to.equal(character2Name);
         expect(characterData.storeId.eq(0)).to.be.true;
         expect(characterData.characterHash).to.equal(character2Hash);
         expect(characterData.price.eq(character2Price)).to.be.true;
         expect(characterData.active).to.be.true;
-        expect(characterData.avaliable).to.be.true;
+    });
+    it("getCharacters - No records", async function () {
+        let charactersData = await StoreInstance.getCharacters(1, 10, true);
+        expect(charactersData.length).to.equal(0);
+
+        let charactersData2 = await StoreInstance.getCharacters(1, 10, false);
+        expect(charactersData2.length).to.equal(0);
+    });
+    it("getCharacters - Sucess", async function () {
+        await StoreInstance.connect(moderator).addCharacter(character1Name, character1Hash, character1Price, character1Active);
+        await StoreInstance.connect(moderator).addCharacter(character2Name, character2Hash, character2Price, character2Active);
+
+        let charactersData = await StoreInstance.getCharacters(1, 10, true);
+        expect(charactersData.length).to.equal(1);
+
+        let charactersData2 = await StoreInstance.getCharacters(1, 10, false);
+        expect(charactersData2.length).to.equal(2);
     });
 });

@@ -43,14 +43,14 @@
     "yarn": "~1.22.19"
   },
   "dependencies": {
-    "@guildsworn/priceresolver-contracts": "^1.0.14",
+    "@guildsworn/priceresolver-contracts": "^1.0.16",
     "@openzeppelin/contracts": "^4.7.3"
   },
   "devDependencies": {
     "@ethersproject/abi": "^5.4.7",
     "@ethersproject/bytes": "^5.0.0",
     "@ethersproject/providers": "^5.7.1",
-    "@guildsworn/hardhat-guildsworn": "^1.0.1",
+    "@guildsworn/hardhat-guildsworn": "^1.0.14",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.5",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.6",
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",

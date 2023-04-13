@@ -388,24 +388,24 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
-"@guildsworn/hardhat-guildsworn@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@guildsworn/hardhat-guildsworn/-/hardhat-guildsworn-1.0.1.tgz#e833f7a612bda02e246acc76f4ee3fa05a11009f"
-  integrity sha512-k1Q/ARsyO9Dh28yMdaoMkU/8AWdTThuBlkvTpdvXwUrnEn3yfVbTwIc+sXluyeoQBckMX6dqK1GtyMuCcwyskw==
-
-"@guildsworn/priceresolver-contracts@^1.0.14":
+"@guildsworn/hardhat-guildsworn@^1.0.14":
   version "1.0.14"
-  resolved "https://registry.yarnpkg.com/@guildsworn/priceresolver-contracts/-/priceresolver-contracts-1.0.14.tgz#caa30f7976b1e416eb3ce21cfbd10cb4136af66d"
-  integrity sha512-eyUvFmd0U/yBgFat7uSBIviNv9GNGQy7nFbIA66n+JTZcSg6amCNxP8Wq5blL+4gDZiybO4wBaJb1jQk6Rvuww==
+  resolved "https://registry.yarnpkg.com/@guildsworn/hardhat-guildsworn/-/hardhat-guildsworn-1.0.14.tgz#5200a4bb6144d444fb594d92a7d8bf61c45531fe"
+  integrity sha512-syvzs0BCZt1GuYIu1Whq8TLKs5kk6dSqGY6I8tnq6URNAzg2UbqlNx7hlx5ODYFqzNmxK0csyYe8gSKXQ5iyew==
+
+"@guildsworn/priceresolver-contracts@^1.0.16":
+  version "1.0.16"
+  resolved "https://registry.yarnpkg.com/@guildsworn/priceresolver-contracts/-/priceresolver-contracts-1.0.16.tgz#4cfb6a8a4bdaf62cce96c1fedc0944fae0c008d3"
+  integrity sha512-eCy1tE35+9wsJFmVkC/5IY0qYDI3/U54tdWrxo8IHqZFvP1WwwnZJaPy3mFwxPPCKcQVpWFsTxb6xOFFkEsPVQ==
   dependencies:
-    "@guildsworn/token-contracts" "^1.0.13"
+    "@guildsworn/token-contracts" "^1.0.16"
     "@openzeppelin/contracts" "^4.7.3"
     "@uniswap/v2-core" "^1.0.1"
 
-"@guildsworn/token-contracts@^1.0.13":
-  version "1.0.13"
-  resolved "https://registry.yarnpkg.com/@guildsworn/token-contracts/-/token-contracts-1.0.13.tgz#df4e42876218d27d88e4f6f0ecf41e6d4fb00a3a"
-  integrity sha512-ewGzS+95YfM6fObn1JeV5UHFT+vw9To158hHKwPPOj9cMIzkjfUP1cvPN7+La2yxsKVqx42fIIlFhp465tD47w==
+"@guildsworn/token-contracts@^1.0.16":
+  version "1.0.16"
+  resolved "https://registry.yarnpkg.com/@guildsworn/token-contracts/-/token-contracts-1.0.16.tgz#1ea50dfc6099f0827a7d59de10638c39875b51d6"
+  integrity sha512-mUCVtvbfo9GA9NZeBZ7nW06KplFF4m5qWKxJPFE22t+iy5RxyIYylb/jFbHv8Lx8s9Lh7BFKYXOhcHn4mTzokg==
   dependencies:
     "@openzeppelin/contracts" "^4.7.3"
 

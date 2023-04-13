@@ -151,4 +151,5 @@ describe("CharacterStore_4_PUBLIC", function () {
         // Result of kickback: 0.1 ELD
         expect(await EldTokenInstance.connect(tester1).balanceOf(tester1.address)).to.equal(utils.parseEther("0.1"));
     });
+
 });
