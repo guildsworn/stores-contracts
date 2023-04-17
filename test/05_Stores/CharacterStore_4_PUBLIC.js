@@ -148,19 +148,19 @@ describe("CharacterStore_4_PUBLIC", function () {
         // Character price: 0.1 STABLE
         // 1 STABLE = 10 ELD
         // Kickback: 10
-        // Result of kickback: 0.1 ELD
+        // Result of kickback: 0.1 ELDF
         expect(await EldTokenInstance.connect(tester1).balanceOf(tester1.address)).to.equal(utils.parseEther("0.1"));
     });
     it("buyWithStable - Many items list all", async function () {
-        let charTotalPrice = character1Price.mul(5);
+        let charTotalPrice = character1Price.mul(30);
         await TokenInstance.connect(moderator).mint(tester1.address, charTotalPrice);
         await TokenInstance.connect(tester1).approve(StoreInstance.address, charTotalPrice);        
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 30; i++) {
             await StoreInstance.connect(tester1).buyWithStable(character1Hash);
         }
 
-        let myChars = await CharacterNftInstance.connect(tester1).getCharactersByAccount(1, 10, tester1.address);
-        expect(myChars.length).to.equal(5);
+        let myChars = await CharacterNftInstance.connect(tester1).getCharactersByAccount(1, 1000, tester1.address);
+        expect(myChars.length).to.equal(30);
     });
 });
