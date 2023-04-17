@@ -30,6 +30,15 @@
             "runtimeExecutable": "npx",
             "args": ["hardhat", "test", "${file}"],
             "cwd": "${workspaceFolder}"
+          },
+          {
+            "type": "node",
+            "request": "launch",
+            "name": "hardhat run script",
+            "skipFiles": [""],
+            "runtimeExecutable": "npx",
+            "args": ["hardhat", "run", "${file}", "--network", "oasis_sapphire_testnet"],
+            "cwd": "${workspaceFolder}"
           }
     ]
 }
