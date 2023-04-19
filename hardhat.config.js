@@ -79,7 +79,7 @@ module.exports = {
         url: `https://sapphire.oasis.io`,
         chainId: 23294,
         accounts: ACCOUNTS,
-        live: true,
+        live: false,
         saveDeployments: true,
         blockConfirmations: 2,
         tags: ["live", "oasis", "mainnet", "production"]

@@ -341,22 +341,17 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable, ICh
         CharacterDataResult[] memory characterDataResultArray = new CharacterDataResult[](pageSize_);
         for (uint256 i = start; i < length; i++) {
 			bool added = false;
-            if (activeOnly_) {
-                if (_characterDataMap[_avaliableCharacters[i]].active) {
-                    characterDataResultArray[resultIndex] = getCharacter(_avaliableCharacters[i]);
-					added = true;
-                }
-            } else {
-                characterDataResultArray[resultIndex] = getCharacter(_avaliableCharacters[i]);
+            if ((activeOnly_ && _characterDataMap[_avaliableCharacters[i]].active) || !activeOnly_) {
+				characterDataResultArray[resultIndex] = getCharacter(_avaliableCharacters[i]);
 				added = true;
             }
             
             if (resultIndex + 1 == pageSize_) {
                 break;
-            }
-
-			if (added)
-            	resultIndex++;
+            } else if (added)
+			{
+				resultIndex++;
+			}
         }
         // Check page size
         if (resultIndex + 1 < pageSize_) {

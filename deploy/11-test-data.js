@@ -117,18 +117,18 @@ module.exports = async ({ getNamedAccounts, deployments, network, guildsworn }) 
             log(`Character ${character6Name} created`);
         }
 
-        // Mint some stable tokens to player 1
-        transactionResponse = await stablePlayer1WriteInstance.mint(player1, utils.parseEther("1000"));
-        await transactionResponse.wait(confirmations);
+        // // Mint some stable tokens to player 1
+        // transactionResponse = await stablePlayer1WriteInstance.mint(player1, utils.parseEther("1000"));
+        // await transactionResponse.wait(confirmations);
 
-        // Player 1 buys character 1
-        let characterData = await storeDeployerInstance.getCharacter(character1Hash);
-        //transactionResponse = await stablePlayer1WriteInstance.approve(storeDeployerInstance.address, characterData.price);
-        //await transactionResponse.wait(confirmations);
+        // // Player 1 buys character 1
+        // let characterData = await storeDeployerInstance.getCharacter(character1Hash);
+        // //transactionResponse = await stablePlayer1WriteInstance.approve(storeDeployerInstance.address, characterData.price);
+        // //await transactionResponse.wait(confirmations);
 
-        transactionResponse = await storePlayer1WriteInstance.buyWithStable(character1Hash);
-        await transactionResponse.wait(confirmations);
-        log(`Character ${character1Name} bought by ${player1}`);
+        // transactionResponse = await storePlayer1WriteInstance.buyWithStable(character1Hash);
+        // await transactionResponse.wait(confirmations);
+        // log(`Character ${character1Name} bought by ${player1}`);
 
         log(`Creating test data finished.`);
     } 

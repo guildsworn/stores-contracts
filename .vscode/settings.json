@@ -18,5 +18,9 @@
     "[solidity]": {
         "editor.defaultFormatter": "NomicFoundation.hardhat-solidity"
     },
-
+    "editor.inlineSuggest.enabled": true,
+    "github.copilot.enable": {
+        "*": true,
+        "properties": false
+    }
 }
