@@ -43,7 +43,7 @@
     "yarn": "~1.22.19"
   },
   "dependencies": {
-    "@guildsworn/priceresolver-contracts": "^1.0.17",
+    "@guildsworn/priceresolver-contracts": "^1.0.18",
     "@openzeppelin/contracts": "^4.7.3"
   },
   "devDependencies": {
