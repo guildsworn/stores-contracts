@@ -393,19 +393,19 @@
   resolved "https://registry.yarnpkg.com/@guildsworn/hardhat-guildsworn/-/hardhat-guildsworn-1.0.14.tgz#5200a4bb6144d444fb594d92a7d8bf61c45531fe"
   integrity sha512-syvzs0BCZt1GuYIu1Whq8TLKs5kk6dSqGY6I8tnq6URNAzg2UbqlNx7hlx5ODYFqzNmxK0csyYe8gSKXQ5iyew==
 
-"@guildsworn/priceresolver-contracts@^1.0.16":
-  version "1.0.16"
-  resolved "https://registry.yarnpkg.com/@guildsworn/priceresolver-contracts/-/priceresolver-contracts-1.0.16.tgz#4cfb6a8a4bdaf62cce96c1fedc0944fae0c008d3"
-  integrity sha512-eCy1tE35+9wsJFmVkC/5IY0qYDI3/U54tdWrxo8IHqZFvP1WwwnZJaPy3mFwxPPCKcQVpWFsTxb6xOFFkEsPVQ==
+"@guildsworn/priceresolver-contracts@^1.0.17":
+  version "1.0.17"
+  resolved "https://registry.yarnpkg.com/@guildsworn/priceresolver-contracts/-/priceresolver-contracts-1.0.17.tgz#745c7714c57230b75875eebd2ef952b335623650"
+  integrity sha512-EGqU0NWoMucFRRYbmyOTl46h8uv9GCCxzi0pZjkkwJxNpdit+6OaRuWNqk4fxcz8V6RFW42oSyi9NHfjrBkFuw==
   dependencies:
-    "@guildsworn/token-contracts" "^1.0.16"
+    "@guildsworn/token-contracts" "^1.0.17"
     "@openzeppelin/contracts" "^4.7.3"
     "@uniswap/v2-core" "^1.0.1"
 
-"@guildsworn/token-contracts@^1.0.16":
-  version "1.0.16"
-  resolved "https://registry.yarnpkg.com/@guildsworn/token-contracts/-/token-contracts-1.0.16.tgz#1ea50dfc6099f0827a7d59de10638c39875b51d6"
-  integrity sha512-mUCVtvbfo9GA9NZeBZ7nW06KplFF4m5qWKxJPFE22t+iy5RxyIYylb/jFbHv8Lx8s9Lh7BFKYXOhcHn4mTzokg==
+"@guildsworn/token-contracts@^1.0.17":
+  version "1.0.17"
+  resolved "https://registry.yarnpkg.com/@guildsworn/token-contracts/-/token-contracts-1.0.17.tgz#ad39529d94417ae14208b53347b1c65d817d4dcf"
+  integrity sha512-w3knns7XgQAmNaIScgtZy//QKgjfC6kQ9JzrxO293qcjE61FQf9HCNBG+fQim99GgnnTpI41OIFP9SaDo45a0g==
   dependencies:
     "@openzeppelin/contracts" "^4.7.3"
 

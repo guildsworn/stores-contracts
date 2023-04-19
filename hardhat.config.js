@@ -20,7 +20,6 @@ const PLAYER2_PRIVATE_KEY = process.env.PLAYER2_PRIVATE_KEY;
 const PLAYER3_PRIVATE_KEY = process.env.PLAYER3_PRIVATE_KEY;
 const REPORT_GAS = process.env.REPORT_GAS;
 const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
-const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
 
 const ACCOUNTS = [];
 if (DEPLOYER_PRIVATE_KEY) {
@@ -144,8 +143,5 @@ module.exports = {
   },
   mocha: {
     timeout: 500000,
-  },
-  etherscan: {
-    apiKey: ETHERSCAN_API_KEY
-  },
+  }
 };

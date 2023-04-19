@@ -1,7 +1,7 @@
 module.exports = async ({ getNamedAccounts, deployments, network, guildsworn }) => {
     const { deploy, log } = deployments;
     const { deployer } = await getNamedAccounts();
-    const confirmations = network.blockConfirmations || 1;
+    const confirmations = network.config.blockConfirmations || 1;
 
     let characterStoreAddress = await guildsworn.getCharacterStoreAddress(false);
     if (!characterStoreAddress || characterStoreAddress == "0x0000000000000000000000000000000000000000") {

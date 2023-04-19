@@ -1,7 +1,7 @@
 module.exports = async ({ getNamedAccounts, deployments, network, guildsworn }) => {
     const { log } = deployments;
     const { deployer, admin, moderator } = await getNamedAccounts();
-    const confirmations = network.blockConfirmations || 1;
+    const confirmations = network.config.blockConfirmations || 1;
     let deployerSigner = await ethers.getSigner(deployer);
     let adminSigner = await ethers.getSigner(admin);
     let moderatorSigner = await ethers.getSigner(moderator);

@@ -2,7 +2,7 @@ const { utils } = require("ethers");
 module.exports = async ({ getNamedAccounts, deployments, network, guildsworn }) => {
     const { log } = deployments;
     const { deployer, moderator, backend, player1, player2, player3 } = await getNamedAccounts();
-    const confirmations = network.blockConfirmations || 1;
+    const confirmations = network.config.blockConfirmations || 1;
 
     if (!network.live) {
         let deployerSigner = await ethers.getSigner(deployer);
