@@ -10,7 +10,7 @@
             "name": "hardhat deploy",
             "skipFiles": ["<node_internals>/**"],
             "runtimeExecutable": "npx",
-            "args": ["hardhat", "deploy", "--write", "true", "--reset"],
+            "args": ["hardhat", "deploy"],
             "cwd": "${workspaceFolder}"
           },
           {
@@ -37,7 +37,7 @@
             "name": "hardhat run script",
             "skipFiles": [""],
             "runtimeExecutable": "npx",
-            "args": ["hardhat", "run", "${file}", "--network", "oasis_sapphire_testnet"],
+            "args": ["hardhat", "run", "${file}", "--network", "oasis_sapphire_mainnet"],
             "cwd": "${workspaceFolder}"
           }
     ]

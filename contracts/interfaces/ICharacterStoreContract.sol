@@ -35,6 +35,8 @@ interface ICharacterStoreContract {
   function getAvaliableCharacters (  ) external view returns ( bytes32[] memory );
   function getCharacter ( bytes32 characterHash_ ) external view returns ( CharacterDataResult memory );
   function getCharacters(uint256 page_, uint256 pageSize_, bool activeOnly_) external view returns (CharacterDataResult[] memory);
+  function getCharacterEldPrice(bytes32 characterHash_) external view returns (uint256 priceInEld);
+  function getCharacterEldKickback(bytes32 characterHash_) external view returns (uint256 eldAmount);
   function getEldDiscount (  ) external view returns ( uint8 );
   function getEldKickback (  ) external view returns ( uint8 );
   function getEldTokenAddress (  ) external view returns ( address );

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-// import "hardhat/console.sol";
+//import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -233,7 +233,7 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable, ICh
 		require(currentCharacter.avaliable, "Character does not exist!");
 		require(currentCharacter.active, "Character is not active!");
 
-		//_stableInstance.safeTransferFrom(_msgSender(), _vaultAddress, currentCharacter.price);
+		// Transfer stable to vault
 		SafeERC20.safeTransferFrom(
 			_stableInstance,
 			_msgSender(),
@@ -241,41 +241,35 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable, ICh
 			currentCharacter.price
 		);
 
+		// Mint character
 		_nftInstance.safeMint(_msgSender(), characterHash_);
 
 		emit CharacterBought(characterHash_, _msgSender(), address(_stableInstance), currentCharacter.price);
 
-		uint256 oneToken = 1 * 10 ** _priceResolverInstance.getStableDecimals();
+		// Process kickback
 		uint256 stableToEldPrice = _priceResolverInstance.getStablePrice();
-		uint256 tokenAmount = ((uint256(_eldKickback) * currentCharacter.price) / 100) * stableToEldPrice;
-		tokenAmount = tokenAmount / oneToken;
-
-		// console.log("Character price: %s STABLE", currentCharacter.price);
-		// console.log("1 Ether STABLE = %s ELD", stableToEldPrice);
-		// console.log("ELD kickback: %s", _eldKickback);
-		// console.log("Result of kickback: %s ELD", tokenAmount);
-
-		if (tokenAmount > 0) {
-			_eldInstance.safeMint(_msgSender(), tokenAmount);
+		uint256 stableDecimals = _priceResolverInstance.getStableDecimals();
+		uint256 tokenKickback = _getTokenKickback(currentCharacter.price, stableToEldPrice, stableDecimals);
+		if (tokenKickback > 0) {
+			// Mint kickback ELD tokens to user
+			_eldInstance.safeMint(_msgSender(), tokenKickback);
 		}
 	}
 
 	function buyWithEld(bytes32 characterHash_) public nonReentrant {
 		require(_storeActive, "Store is closed!");
-		CharacterData memory currentCharacter = _characterDataMap[characterHash_];
-		require(currentCharacter.avaliable, "Character does not exist!");
-		require(currentCharacter.active, "Character is not active!");
 
-		uint eldldToStablePrice = _priceResolverInstance.getStablePrice();
-		uint priceInEld = (((100 - _eldDiscount) * currentCharacter.price) / 100) * eldldToStablePrice;
-		//_eldInstance.safeTransferFrom(_msgSender(), _vaultAddress, priceInEld);
+		// Calculate character price in eld with discaunt
+		uint256 priceInEld = getCharacterEldPrice(characterHash_);
+		require(priceInEld > 0, "Character ELD price is invalid!");
+
+		// Transfer eld to vault
 		SafeERC20.safeTransferFrom(IERC20(address(_eldInstance)), _msgSender(), _vaultAddress, priceInEld);
+
+		// Mint character
 		_nftInstance.safeMint(_msgSender(), characterHash_);
 		
 		emit CharacterBought(characterHash_, _msgSender(), address(_eldInstance), priceInEld);
-
-		uint tokenAmount = ((_eldKickback * priceInEld) / 100);
-		_eldInstance.safeMint(_msgSender(), tokenAmount);
 	}
 
 	// **************************************************
@@ -367,6 +361,30 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable, ICh
         }
 	}
 
+	function getCharacterEldPrice(bytes32 characterHash_) public view returns (uint256 priceInEld) {
+		CharacterData memory characterData = _characterDataMap[characterHash_];
+		require(characterData.avaliable, "Character does not exist!");
+		require(characterData.active, "Character is not active!");
+
+		uint256 stableInTokens = _priceResolverInstance.getStablePrice();
+		uint256 stableDecimal = _priceResolverInstance.getStableDecimals();
+		priceInEld = _getTokenCost(characterData.price, stableInTokens, stableDecimal);
+
+		return priceInEld;
+	}
+
+	function getCharacterEldKickback(bytes32 characterHash_) public view returns (uint256 eldAmount) {
+		CharacterData memory characterData = _characterDataMap[characterHash_];
+		require(characterData.avaliable, "Character does not exist!");
+		require(characterData.active, "Character is not active!");
+
+		uint256 stableInTokens = _priceResolverInstance.getStablePrice();
+		uint256 stableDecimal = _priceResolverInstance.getStableDecimals();
+		eldAmount = _getTokenKickback(characterData.price, stableInTokens, stableDecimal);
+
+		return eldAmount;
+	}
+
 	function isInitialised() public view returns (bool) {
 		return _initialised;
 	}
@@ -375,6 +393,43 @@ contract CharacterStoreContract is ReentrancyGuard, AccessControlEnumerable, ICh
         return interfaceId_ == type(ICharacterStoreContract).interfaceId || super.supportsInterface(interfaceId_);
     }
 
+	// **************************************************
+	// ************** PRIVATE REGION *******************
+	// **************************************************
+	function _getTokenCost(uint256 stableCost_, uint256 stableInTokens_, uint256 stableDecimal_) private view returns (uint256 tokenAmount) {
+		uint256 oneToken = 1 * 10 ** stableDecimal_;
+		tokenAmount = _applyDiscount(stableCost_) * (stableInTokens_) / oneToken;
+
+		// console.log("_getTokenCost");
+		// console.log("stableCost_ %s STABLE", stableCost_);
+		// console.log("stableInTokens_", stableInTokens_);
+		// console.log("Result of _getTokenCost: %s ELD", tokenAmount);
+
+		return tokenAmount;
+	}
+
+	function _applyDiscount(uint256 amount_) private view returns (uint256 discountAmount) {
+		discountAmount = (((100 - _eldDiscount) * amount_) / 100);
+		// console.log("_applyDiscount");
+		// console.log("amount: %s", amount_);
+		// console.log("_eldDiscount: %s", _eldDiscount);
+		// console.log("Result of _applyDiscount: %s", discountAmount);
+		return discountAmount;
+	}
+
+	function _getTokenKickback(uint256 stableCost_, uint256 stableInTokens_, uint256 stableDecimal_) private view returns (uint256 tokenAmount) {
+		uint256 oneToken = 1 * 10 ** stableDecimal_;
+		tokenAmount = ((uint256(_eldKickback) * stableCost_) / 100) * stableInTokens_;
+		tokenAmount = tokenAmount / oneToken;
+
+		// console.log("_getTokenKickback");
+		// console.log("stableCost_ %s STABLE", stableCost_);
+		// console.log("stableInTokens_", stableInTokens_);
+		// console.log("ELD kickback: %s", _eldKickback);
+		// console.log("Result of _getTokenKickback: %s ELD", tokenAmount);
+
+		return tokenAmount;
+	}
 	// **************************************************
 	// ****************** EVENTS REGION *****************
 	// **************************************************

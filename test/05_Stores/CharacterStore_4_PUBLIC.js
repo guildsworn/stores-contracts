@@ -163,4 +163,46 @@ describe("CharacterStore_4_PUBLIC", function () {
         let myChars = await CharacterNftInstance.connect(tester1).getCharactersByAccount(1, 1000, tester1.address);
         expect(myChars.length).to.equal(30);
     });
+    it("buyWithEld - Fail if Store is closed!", async function () {
+        await StoreInstance.connect(moderator).setStoreActive(false);
+
+        let charEldPrice = await StoreInstance.connect(tester1).getCharacterEldPrice(character1Hash);
+        await EldTokenInstance.connect(minter1).safeMint(tester1.address, charEldPrice);
+        await EldTokenInstance.connect(tester1).approve(StoreInstance.address, charEldPrice);        
+
+        await expect(StoreInstance.connect(tester1).buyWithEld(character1Hash)).to.be.revertedWith('Store is closed!');
+    });
+    it("buyWithEld - Fail Character does not exist!", async function () {
+        await StoreInstance.connect(moderator).removeCharacter(character1Hash);
+        
+        let charEldPrice = utils.parseEther("10");
+        await EldTokenInstance.connect(minter1).safeMint(tester1.address, charEldPrice);
+        await EldTokenInstance.connect(tester1).approve(StoreInstance.address, charEldPrice);        
+
+        await expect(StoreInstance.connect(tester1).buyWithEld(character1Hash)).to.be.revertedWith('Character does not exist!');
+    });
+    it("buyWithEld - Fail Character is not active!", async function () {
+        let newCharacter1ActiveEncoded = ethers.utils.defaultAbiCoder.encode(["bool"], [false]);
+        await StoreInstance.connect(moderator).editCharacter(character1Hash, CharacterParams.CHAR_ACTIVE, newCharacter1ActiveEncoded);
+        
+        let charEldPrice = utils.parseEther("10");
+        await EldTokenInstance.connect(minter1).safeMint(tester1.address, charEldPrice);
+        await EldTokenInstance.connect(tester1).approve(StoreInstance.address, charEldPrice);        
+
+        await expect(StoreInstance.connect(tester1).buyWithEld(character1Hash)).to.be.revertedWith('Character is not active!');
+    });
+    it("buyWithEld - Sucess", async function () {        
+        let charEldPrice = await StoreInstance.connect(tester1).getCharacterEldPrice(character1Hash);
+        // Character price: 0.1 STABLE
+        // 1 STABLE = 10 ELD
+        // Discount: 50
+        // Result cost: 5 ELDF
+        expect (charEldPrice).to.equal(utils.parseEther("0.5"));
+        await EldTokenInstance.connect(minter1).safeMint(tester1.address, charEldPrice);
+        await EldTokenInstance.connect(tester1).approve(StoreInstance.address, charEldPrice);        
+
+        await StoreInstance.connect(tester1).buyWithEld(character1Hash);
+        expect(await EldTokenInstance.connect(tester1).balanceOf(vault.address)).to.equal(charEldPrice);
+        expect(await CharacterNftInstance.connect(tester1).balanceOf(tester1.address)).to.equal(1);
+    });
 });
