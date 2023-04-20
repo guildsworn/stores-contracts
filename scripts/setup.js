@@ -21,6 +21,7 @@ let priceResolverOracleDeployerInstance;
 
 let storeModeratorWriteInstance;
 
+let storeAdminInstance;
 let eldfallTokenAdminInstance;
 
 let storePlayer1WriteInstance;
@@ -51,6 +52,7 @@ async function init() {
     storeModeratorWriteInstance = await ethers.getContractAt("CharacterStoreContract", storeAddress, moderatorSigner);
     priceResolverOracleModeratorInstance = await ethers.getContractAt("PriceResolverOracleContract", priceResolverOracleAddress, moderatorSigner);
 
+    storeAdminInstance = await ethers.getContractAt("CharacterStoreContract", storeAddress, adminSigner);
     eldfallTokenAdminInstance = await ethers.getContractAt("EldfallTokenContract", eldfallTokenAddress, adminSigner);
     priceResolverOracleAdminInstance = await ethers.getContractAt("PriceResolverOracleContract", priceResolverOracleAddress, adminSigner);
 
@@ -58,6 +60,20 @@ async function init() {
     stablePlayer1WriteInstance = await ethers.getContractAt("ERC20MockContract", stableTokenAddress, player1Signer);
     characterNftPlayer1WriteInstance = await ethers.getContractAt("CharacterNftContract", nftAddress, player1Signer);
     eldfallTokenPlayer1Instance = await ethers.getContractAt("EldfallTokenContract", eldfallTokenAddress, player1Signer);
+}
+
+async function revokeMinterOnEldfallToken(account)
+{
+    const confirmations = network.config.blockConfirmations || 1;
+    let minterRole = await eldfallTokenDeployerInstance.MINTER_ROLE();
+    let hasRole = await eldfallTokenDeployerInstance.hasRole(minterRole, account);
+    if (hasRole) {
+        let transactionResponse = await eldfallTokenAdminInstance.revokeRole(minterRole, account);
+        await transactionResponse.wait(confirmations);
+        console.log(`Minter ${account} removed from EldfallTokenContract.`);
+    } else {
+        console.log(`Minter ${account} already removed from EldfallTokenContract.`);
+    }    
 }
 
 async function setMinterOnEltToken(account)
@@ -148,9 +164,16 @@ async function editCharacterPrice(characterHash, priceEth)
     }    
 }
 
+async function KillStoreContract(){
+    const confirmations = network.config.blockConfirmations || 1;
+    let transactionResponse = await storeAdminInstance.killContract();
+    await transactionResponse.wait(confirmations);
+    console.log(`Store contract killed.`);
+}
+
 async function main() {
     const { deployer, admin, moderator, backend, player1, player2, player3 } = await hre.getNamedAccounts();
-    const eldKickback = process.env.ELD_KICKBACK ? parseInt(process.env.ELD_KICKBACK) : 10;
+    //const eldKickback = process.env.ELD_KICKBACK ? parseInt(process.env.ELD_KICKBACK) : 10;
 
     await init();
     //await setMinterOnEltToken(deployer);
@@ -162,30 +185,32 @@ async function main() {
     // let character6Hash = utils.hashMessage(character6Name);
     // await removeCharacter(character6Hash);
 
-    let character1Name = "Onitaoshi";
-    let character1Hash = utils.hashMessage(character1Name);
-    let character1Price = "30";
-    await editCharacterPrice(character1Hash, character1Price);
+    // let character1Name = "Onitaoshi";
+    // let character1Hash = utils.hashMessage(character1Name);
+    // let character1Price = "30";
+    // await editCharacterPrice(character1Hash, character1Price);
 
-    let character2Name = "Rangers-Guild Hunter";
-    let character2Hash = utils.hashMessage(character2Name);
-    let character2Price = "30";
-    await editCharacterPrice(character2Hash, character2Price);
+    // let character2Name = "Rangers-Guild Hunter";
+    // let character2Hash = utils.hashMessage(character2Name);
+    // let character2Price = "30";
+    // await editCharacterPrice(character2Hash, character2Price);
 
-    let character3Name = "Expeditionary Hierophant";
-    let character3Hash = utils.hashMessage(character3Name);
-    let character3Price = "30";
-    await editCharacterPrice(character3Hash, character3Price);
+    // let character3Name = "Expeditionary Hierophant";
+    // let character3Hash = utils.hashMessage(character3Name);
+    // let character3Price = "30";
+    // await editCharacterPrice(character3Hash, character3Price);
 
-    let character4Name = "Helrin Expatriate";
-    let character4Hash = utils.hashMessage(character4Name);
-    let character4Price = "30";
-    await editCharacterPrice(character4Hash, character4Price);
+    // let character4Name = "Helrin Expatriate";
+    // let character4Hash = utils.hashMessage(character4Name);
+    // let character4Price = "30";
+    // await editCharacterPrice(character4Hash, character4Price);
 
-    let character5Name = "Taskmage Explorer";
-    let character5Hash = utils.hashMessage(character5Name);
-    let character5Price = "30";
-    await editCharacterPrice(character5Hash, character5Price);
+    // let character5Name = "Taskmage Explorer";
+    // let character5Hash = utils.hashMessage(character5Name);
+    // let character5Price = "30";
+    // await editCharacterPrice(character5Hash, character5Price);
+
+
 }
 
 main().catch((error) => {
