@@ -1,6 +1,7 @@
 const { ethers, network, guildsworn } = require("hardhat");
 const { utils } = require("ethers");
 const hre = require("hardhat");
+const confirmations = network.config.blockConfirmations || 1;
 
 let deployerSigner;
 let adminSigner;
@@ -19,10 +20,12 @@ let characterNftDeployerInstance;
 let eldfallTokenDeployerInstance;
 let priceResolverOracleDeployerInstance;
 
-let storeModeratorWriteInstance;
+let storeModeratorInstance;
 
 let storeAdminInstance;
+let characterNftAdminInstance;
 let eldfallTokenAdminInstance;
+let priceResolverOracleAdminInstance;
 
 let storePlayer1WriteInstance;
 let stablePlayer1WriteInstance;
@@ -49,10 +52,11 @@ async function init() {
     eldfallTokenDeployerInstance = await ethers.getContractAt("EldfallTokenContract", eldfallTokenAddress, deployerSigner);
     priceResolverOracleDeployerInstance = await ethers.getContractAt("PriceResolverOracleContract", priceResolverOracleAddress, deployerSigner);
 
-    storeModeratorWriteInstance = await ethers.getContractAt("CharacterStoreContract", storeAddress, moderatorSigner);
+    storeModeratorInstance = await ethers.getContractAt("CharacterStoreContract", storeAddress, moderatorSigner);
     priceResolverOracleModeratorInstance = await ethers.getContractAt("PriceResolverOracleContract", priceResolverOracleAddress, moderatorSigner);
 
     storeAdminInstance = await ethers.getContractAt("CharacterStoreContract", storeAddress, adminSigner);
+    characterNftAdminInstance = await ethers.getContractAt("CharacterNftContract", nftAddress, adminSigner);
     eldfallTokenAdminInstance = await ethers.getContractAt("EldfallTokenContract", eldfallTokenAddress, adminSigner);
     priceResolverOracleAdminInstance = await ethers.getContractAt("PriceResolverOracleContract", priceResolverOracleAddress, adminSigner);
 
@@ -62,9 +66,8 @@ async function init() {
     eldfallTokenPlayer1Instance = await ethers.getContractAt("EldfallTokenContract", eldfallTokenAddress, player1Signer);
 }
 
-async function revokeMinterOnEldfallToken(account)
+async function eldfallTokenRevokeMinterRole(account)
 {
-    const confirmations = network.config.blockConfirmations || 1;
     let minterRole = await eldfallTokenDeployerInstance.MINTER_ROLE();
     let hasRole = await eldfallTokenDeployerInstance.hasRole(minterRole, account);
     if (hasRole) {
@@ -76,9 +79,8 @@ async function revokeMinterOnEldfallToken(account)
     }    
 }
 
-async function setMinterOnEltToken(account)
+async function eldfallTokenGrantMinterRole(account)
 {
-    const confirmations = network.config.blockConfirmations || 1;
     let minterRole = await eldfallTokenDeployerInstance.MINTER_ROLE();
     let hasRole = await eldfallTokenDeployerInstance.hasRole(minterRole, account);
     if (!hasRole) {
@@ -90,20 +92,31 @@ async function setMinterOnEltToken(account)
     }    
 }
 
-async function mintEldfallToken(account, amount)
+async function characterNftContractRevokeMinterRole(account)
 {
-    const confirmations = network.config.blockConfirmations || 1;
+    let minterRole = await characterNftDeployerInstance.MINTER_ROLE();
+    let hasRole = await characterNftDeployerInstance.hasRole(minterRole, account);
+    if (hasRole) {
+        let transactionResponse = await characterNftAdminInstance.revokeRole(minterRole, account);
+        await transactionResponse.wait(confirmations);
+        console.log(`Minter ${account} removed from CharacterNftContract.`);
+    } else {
+        console.log(`Minter ${account} already removed from CharacterNftContract.`);
+    }    
+}
+
+async function eldfallTokenMint(account, amount)
+{
     let transactionResponse = await eldfallTokenDeployerInstance.safeMint(account, amount);
     await transactionResponse.wait(confirmations);
     console.log(`Minted ${amount} EldfallTokenContract to ${account}.`);
 }
 
-async function setKickBack(kickback)
+async function characterStoreSetEldKickback(kickback)
 {
-    const confirmations = network.config.blockConfirmations || 1;
     let kickbacknow = await storeDeployerInstance.getEldKickback();
     if (kickbacknow != kickback) {
-        let transactionResponse = await storeModeratorWriteInstance.setEldKickback(kickback);
+        let transactionResponse = await storeModeratorInstance.setEldKickback(kickback);
         await transactionResponse.wait(confirmations);
         console.log(`Kickback set to ${kickback}.`);
     } else {
@@ -111,12 +124,11 @@ async function setKickBack(kickback)
     }
 }
 
-async function setStableInstance(stableAddress)
+async function characterStoreSetStableInstance(stableAddress)
 {
-    const confirmations = network.config.blockConfirmations || 1;
     let stablenow = await storeDeployerInstance.getStableAddress();
     if (stablenow != stableAddress) {
-        let transactionResponse = await storeModeratorWriteInstance.setStableInstance(stableAddress);
+        let transactionResponse = await storeModeratorInstance.characterStoreSetStableInstance(stableAddress);
         await transactionResponse.wait(confirmations);
         console.log(`Stable set to ${stableAddress}.`);
     } else {
@@ -124,13 +136,12 @@ async function setStableInstance(stableAddress)
     }
 }
 
-async function removeCharacter(characterHash)
+async function characterStoreRemoveCharacter(characterHash)
 {
-    const confirmations = network.config.blockConfirmations || 1;
     try
     {
         let character = await storeDeployerInstance.getCharacter(characterHash);
-        let transactionResponse = await storeModeratorWriteInstance.removeCharacter(characterHash);
+        let transactionResponse = await storeModeratorInstance.characterStoreRemoveCharacter(characterHash);
         await transactionResponse.wait(confirmations);
         console.log(`Character ${characterHash} removed.`);
     }
@@ -140,9 +151,8 @@ async function removeCharacter(characterHash)
     }    
 }
 
-async function editCharacterPrice(characterHash, priceEth)
+async function characterStoreEditCharacterPrice(characterHash, priceEth)
 {
-    const confirmations = network.config.blockConfirmations || 1;
     let price = utils.parseEther(priceEth);
     const CHAR_PRICE = ethers.BigNumber.from(3);
     try
@@ -150,7 +160,7 @@ async function editCharacterPrice(characterHash, priceEth)
         let character = await storeDeployerInstance.getCharacter(characterHash);
         if (!character.price.eq(price)) {
             let encodedPrice = new ethers.utils.AbiCoder().encode(["uint256"], [price]);
-            let transactionResponse = await storeModeratorWriteInstance.editCharacter(characterHash, CHAR_PRICE, encodedPrice);
+            let transactionResponse = await storeModeratorInstance.editCharacter(characterHash, CHAR_PRICE, encodedPrice);
             await transactionResponse.wait(confirmations);
             console.log(`Character ${characterHash} price set to ${price}.`);
         } else {
@@ -164,9 +174,9 @@ async function editCharacterPrice(characterHash, priceEth)
     }    
 }
 
-async function KillStoreContract(){
-    const confirmations = network.config.blockConfirmations || 1;
-    let transactionResponse = await storeAdminInstance.killContract();
+async function characterStoreKillContract(storeAddressForKill){
+    let killStoreAdminInstance = await ethers.getContractAt("CharacterStoreContract", storeAddressForKill, adminSigner);
+    let transactionResponse = await killStoreAdminInstance.killContract();
     await transactionResponse.wait(confirmations);
     console.log(`Store contract killed.`);
 }
@@ -176,41 +186,45 @@ async function main() {
     //const eldKickback = process.env.ELD_KICKBACK ? parseInt(process.env.ELD_KICKBACK) : 10;
 
     await init();
-    //await setMinterOnEltToken(deployer);
-    //await mintEldfallToken("0x6E73925aF44a6e8DfDd07653d91B1f2AEdd4da3E", utils.parseEther("1000"));
-    //await setKickBack(eldKickback);
-    //await setStableInstance(ethers.constants.AddressZero);
+    //await eldfallTokenGrantMinterRole(deployer);
+    //await eldfallTokenMint("0x6E73925aF44a6e8DfDd07653d91B1f2AEdd4da3E", utils.parseEther("1000"));
+    //await characterStoreSetEldKickback(eldKickback);
+    //await characterStoreSetStableInstance(ethers.constants.AddressZero);
 
     // let character6Name = "Amazon Gladiatrix";
     // let character6Hash = utils.hashMessage(character6Name);
-    // await removeCharacter(character6Hash);
+    // await characterStoreRemoveCharacter(character6Hash);
 
     // let character1Name = "Onitaoshi";
     // let character1Hash = utils.hashMessage(character1Name);
     // let character1Price = "30";
-    // await editCharacterPrice(character1Hash, character1Price);
+    // await characterStoreEditCharacterPrice(character1Hash, character1Price);
 
     // let character2Name = "Rangers-Guild Hunter";
     // let character2Hash = utils.hashMessage(character2Name);
     // let character2Price = "30";
-    // await editCharacterPrice(character2Hash, character2Price);
+    // await characterStoreEditCharacterPrice(character2Hash, character2Price);
 
     // let character3Name = "Expeditionary Hierophant";
     // let character3Hash = utils.hashMessage(character3Name);
     // let character3Price = "30";
-    // await editCharacterPrice(character3Hash, character3Price);
+    // await characterStoreEditCharacterPrice(character3Hash, character3Price);
 
     // let character4Name = "Helrin Expatriate";
     // let character4Hash = utils.hashMessage(character4Name);
     // let character4Price = "30";
-    // await editCharacterPrice(character4Hash, character4Price);
+    // await characterStoreEditCharacterPrice(character4Hash, character4Price);
 
     // let character5Name = "Taskmage Explorer";
     // let character5Hash = utils.hashMessage(character5Name);
     // let character5Price = "30";
-    // await editCharacterPrice(character5Hash, character5Price);
+    // await characterStoreEditCharacterPrice(character5Hash, character5Price);
 
-
+    // Delete old Store contract
+    let oldStoreContract = "0x6b24eEFA6894B75f0D5A37F00AB975d9730317Fb";
+    await characterNftContractRevokeMinterRole(oldStoreContract);
+    await eldfallTokenRevokeMinterRole(oldStoreContract);
+    await characterStoreKillContract(oldStoreContract);
 }
 
 main().catch((error) => {
