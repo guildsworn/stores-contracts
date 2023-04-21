@@ -34,10 +34,19 @@
           {
             "type": "node",
             "request": "launch",
-            "name": "hardhat run script",
+            "name": "run script oasis_sapphire_testnet",
             "skipFiles": [""],
             "runtimeExecutable": "npx",
             "args": ["hardhat", "run", "${file}", "--network", "oasis_sapphire_testnet"],
+            "cwd": "${workspaceFolder}"
+          },
+          {
+            "type": "node",
+            "request": "launch",
+            "name": "run script oasis_sapphire_mainnet",
+            "skipFiles": [""],
+            "runtimeExecutable": "npx",
+            "args": ["hardhat", "run", "${file}", "--network", "oasis_sapphire_mainnet"],
             "cwd": "${workspaceFolder}"
           }
     ]
