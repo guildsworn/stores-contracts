@@ -15,7 +15,8 @@ module.exports = async ({ getNamedAccounts, deployments, network, guildsworn }) 
         const eldDiscount = process.env.ELD_DISCAUNT ? parseInt(process.env.ELD_DISCAUNT) : 50;
         const eldKickback = process.env.ELD_KICKBACK ? parseInt(process.env.ELD_KICKBACK) : 10;
 
-        const stableCoinAddress = await guildsworn.getStableTokenAddress();
+        //const stableCoinAddress = await guildsworn.getStableTokenAddress();
+        const stableCoinAddress = ethers.constants.AddressZero;
         const eldCoinAddress = await guildsworn.getEldfallTokenAddress();
         const nftCharacterAddress = await guildsworn.getCharacterNftAddress();
         const priceResolverOracleAddress = await guildsworn.getPriceRosolverOracleAddress();

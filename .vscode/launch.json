@@ -37,7 +37,7 @@
             "name": "hardhat run script",
             "skipFiles": [""],
             "runtimeExecutable": "npx",
-            "args": ["hardhat", "run", "${file}", "--network", "oasis_sapphire_mainnet"],
+            "args": ["hardhat", "run", "${file}", "--network", "oasis_sapphire_testnet"],
             "cwd": "${workspaceFolder}"
           }
     ]

@@ -221,7 +221,7 @@ async function main() {
     // await characterStoreEditCharacterPrice(character5Hash, character5Price);
 
     // Delete old Store contract
-    let oldStoreContract = "0x6b24eEFA6894B75f0D5A37F00AB975d9730317Fb";
+    let oldStoreContract = "0xf73f3A708fa983310C218B25464E8B499788d314";
     await characterNftContractRevokeMinterRole(oldStoreContract);
     await eldfallTokenRevokeMinterRole(oldStoreContract);
     await characterStoreKillContract(oldStoreContract);
